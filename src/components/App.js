@@ -7,8 +7,13 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: []
+      data: [],
+      quantity: 10,
+      isLoading: false, 
     };
+    this.handlerAddMore = this.handlerAddMore.bind(this);
+    this.setData = this.setData.bind(this);
+
   }
 
   componentDidMount() {
@@ -27,15 +32,39 @@ class App extends Component {
         let parse = new DOMParser();
         let xmlDoc = parse.parseFromString(data, "text/xml");
         let obj = xmlToJson(xmlDoc);
-        this.setState({ data: obj.rss.channel.item });
+        this.setState({ data: obj.rss.channel.item, isLoading: true});
       });
   }
 
+    handlerAddMore () {
+    const {quantity,data} = this.state;
+    if(quantity >= data.length) return;
+      this.setState((prev)=>{
+          return {
+            quantity: prev.quantity +=2
+          }
+      });
+    }
+
+    setData() {
+    const {quantity,data} = this.state;
+    let newData = [...data];
+    newData.sort((a,b) => {
+       return new Date(b.pubDate) - new Date(a.pubDate);
+    })
+    return newData.splice(0,quantity);
+    }
+
+
+
   render() {
-      const {data} = this.state;
+    const {data,quantity, isLoading} = this.state;
+    let news = this.setData();
+
     return (
       <div className="wrapper">
-        <News data={data} />
+        <News data={news} quantity={quantity} />
+        {(quantity !== data.length && !isLoading) ? 'Loading...' : <button onClick={this.handlerAddMore} className="button-more">load more</button>}
       </div>
     );
   }
