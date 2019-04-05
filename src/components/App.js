@@ -64,7 +64,8 @@ class App extends Component {
     return (
       <div className="wrapper">
         <News data={news} quantity={quantity} />
-        {(quantity !== data.length && !isLoading) ? 'Loading...' : <button onClick={this.handlerAddMore} className="button-more">load more</button>}
+        {isLoading ? '' : <p>Loading...</p>}
+        {(quantity !== data.length && isLoading ) ?  <button onClick={this.handlerAddMore} className="button-more">load more</button> : '' }
       </div>
     );
   }
